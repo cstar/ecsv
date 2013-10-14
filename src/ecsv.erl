@@ -4,9 +4,10 @@
 
 -module(ecsv).
 -author("Nicolas R Dufour <nicolas.dufour@nemoworld.info>").
-
+-include("ecsv.hrl").
 -export([process_csv_file_with/2, process_csv_string_with/2]).
 -export([process_csv_file_with/3, process_csv_string_with/3]).
+-export([process_csv_file_with/4, process_csv_string_with/4]).
 
 %% @doc parse a csv file and process each parsed row with the RowFunction
 process_csv_file_with(IoDevice, RowFunction) ->
@@ -22,12 +23,19 @@ process_csv_file_with(IoDevice, RowFunction, RowFunctionInitState) ->
     InitState = ecsv_parser:init(RowFunction, RowFunctionInitState),
     stream_from_file(IoDevice, InitState).
 
+process_csv_file_with(IoDevice, RowFunction, RowFunctionInitState,Delimiter) ->
+    InitState = ecsv_parser:init(#ecsv_opts{delimiter=Delimiter}, RowFunction, RowFunctionInitState),
+    stream_from_file(IoDevice, InitState).
+
 %% @doc parse a csv string and process each parsed row with the RowFunction
 %% and the initial state InitState
 process_csv_string_with(String, RowFunction, RowFunctionInitState) ->
     InitState = ecsv_parser:init(RowFunction, RowFunctionInitState),
     stream_from_string(String, InitState).
 
+process_csv_string_with(String, RowFunction, RowFunctionInitState, Delimiter) ->
+    InitState = ecsv_parser:init(#ecsv_opts{delimiter=Delimiter}, RowFunction, RowFunctionInitState),
+    stream_from_string(String, InitState).
 % -----------------------------------------------------------------------------
 
 stream_from_string(String, InitState) ->
